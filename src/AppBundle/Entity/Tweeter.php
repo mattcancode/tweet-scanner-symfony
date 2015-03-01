@@ -31,6 +31,13 @@ class Tweeter
     /**
      * @var string
      *
+     * @ORM\Column(name="name", type="string", length=20)
+     */
+    private $name;
+
+    /**
+     * @var string
+     *
      * @ORM\Column(name="screen_name", type="string", length=20)
      */
     private $screenName;
@@ -81,6 +88,29 @@ class Tweeter
     public function getUserId()
     {
         return $this->userId;
+    }
+
+    /**
+     * Set name
+     *
+     * @param string $name
+     * @return Tweeter
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * Get name
+     *
+     * @return string 
+     */
+    public function getName()
+    {
+        return $this->name;
     }
 
     /**

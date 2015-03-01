@@ -1,5 +1,66 @@
 {% extends 'base.html.twig' %}
 
-{% block body %}
-    Homepage.
+{% block stylesheets %}
+	<link rel="stylesheet" href="lib/bootstrap-3.3.2-dist/css/bootstrap.min.css">
+
+	{% stylesheets 'bundles/app/css/*' filter='cssrewrite' %}
+		<link rel="stylesheet" href="{{ asset_url }}" />
+	{% endstylesheets %}
 {% endblock %}
+
+{% block javascripts %}
+	<script src="lib/jquery-1.11.2/jquery-1.11.2.min.js"></script>
+
+	{% javascripts 'bundles/app/js/*' %}
+		<script src="{{ asset_url }}"></script>
+	{% endjavascripts %}
+{% endblock %}
+
+{% block body %}
+
+<div class="navbar navbar-custom">
+	<div class="container">
+	    <div class="navbar-header">
+	      <a class="navbar-brand" href="/">Tweet Scanner</a>
+	    </div>
+	</div>
+</div>
+
+<div class="content">
+	<div class="row">
+
+		<div class="container">
+
+			<div class="col-md-4">
+				<div class="stream">
+					<ol id="tweeters" class="stream-items">
+						<li class="stream-item stream-header text-center">
+							<h3>Top Tweeters</h3>
+						</li>
+						<li class="stream-item stream-footer">
+						</li>
+					</ol>
+				</div>
+			</div>
+
+			<div class="col-md-offset-1 col-md-7">
+				<div class="stream">
+					<ol id="tweets" class="stream-items">
+						<li class="stream-item stream-header text-center">
+							<h3>Recent Tweets</h3>
+						</li>
+						<li class="stream-item stream-item-count text-center">
+							No results
+						</li>
+						<li class="stream-item stream-footer">
+						</li>
+					</ol>
+				</div>
+			</div>
+
+		</div>
+	</div>
+</div>
+
+{% endblock %}
+
