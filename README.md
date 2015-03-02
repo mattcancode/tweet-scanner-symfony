@@ -1,69 +1,64 @@
-Symfony Standard Edition
-========================
+Tweet Scanner
+=============
 
-Welcome to the Symfony Standard Edition - a fully-functional Symfony2
-application that you can use as the skeleton for your new applications.
+This app is currently up and running on an [Amazon Web Services][10] EC2 instance:
+[http://ec2-54-152-218-134.compute-1.amazonaws.com:8080/](http://ec2-54-152-218-134.compute-1.amazonaws.com:8080/)
 
-For details on how to download and get started with Symfony, see the
-[Installation][1] chapter of the Symfony Documentation.
+This is just a simple prototype app to try out [PHP][1], [Symfony2][2],
+[Doctrine][3], and the [Twitter Streaming API][4]. (And the
+[Sublime Text 2][5] editor for the Mac, which is pretty cool but I've
+never been able to do much with it since I've mostly been stuck with
+Eclipse in my day job. I finally bought a license mid-way through this effort.)
 
-What's inside?
---------------
+Tweet Scanner is pretty simple - it simply displays recent tweets that
+mention the keyword "IBM" and displays them in reverse chronological order
+so the most recent is on top. It also shows the 5 tweeters who have
+mentioned "IBM" the most. Using an Ajax service, it continually updates
+the lists with new tweets and any new top 5 tweeters should the rankings change.
 
-The Symfony Standard Edition is configured with the following defaults:
+When deciding where to deploy the project, I originally tried a variety of
+pre-configured Amazon Machine Instances (AMI) including a couple of Symfony
+and LAMP servers, but none really had exactly what I wanted so ended up using
+a barebones Amazon Linux AMI and just installing and configuring the tools manually.
 
-  * An AppBundle you can use to start coding;
+The app consists primarily of the following components:
 
-  * Twig as the only configured template engine;
+**ScannerCommand**
 
-  * Doctrine ORM/DBAL;
+This is the [Symfony2][2] Console Command that actually fetches the tweets
+from [Twitter][6] using the [Twitter Streaming API][4] and stashes them in
+a [MySQL][8] database using the [Doctrine][3] ORM. I had tinkered with the
+[Twitter REST API][9] in some Android apps a couple of years ago, but wasn't
+familiar with the [Streamin API][4]. After cobbling together my own
+implementation to handle the OAuth authentication, I came across the
+[Phirehose][7] library and opted to use that instead. It seems to work nicely.
 
-  * Swiftmailer;
+**Fetch Service**
 
-  * Annotations enabled for everything.
+This is the service that the browser client uses to fetch tweets and tweeters.
+It takes an optional parameter to indicate which tweet id it received last to
+avoid handling duplicates. If called without that parameter, it simply returns
+the 50 most recent tweets. If the parameter is provided, then it obviously
+returns any tweets whose ids are greater than tweet id passed.
+ 
+**Front End Client**
 
-It comes pre-configured with the following bundles:
+The front end is a single page application that includes a simple script that
+fetches tweets and tweeters from the Fetch Service via Ajax and displays them.
+While the service sends the entire original tweet from [Twitter][6], the client
+currently just shows a few details: the user's full name, screen name, avatar,
+and the actual text for the tweet. It could be enhanced to add additional details
+and provide links back to [Twitter][6], that seems a bit much for a simple
+prototype.
 
-  * **FrameworkBundle** - The core Symfony framework bundle
 
-  * [**SensioFrameworkExtraBundle**][6] - Adds several enhancements, including
-    template and routing annotation capability
-
-  * [**DoctrineBundle**][7] - Adds support for the Doctrine ORM
-
-  * [**TwigBundle**][8] - Adds support for the Twig templating engine
-
-  * [**SecurityBundle**][9] - Adds security by integrating Symfony's security
-    component
-
-  * [**SwiftmailerBundle**][10] - Adds support for Swiftmailer, a library for
-    sending emails
-
-  * [**MonologBundle**][11] - Adds support for Monolog, a logging library
-
-  * [**AsseticBundle**][12] - Adds support for Assetic, an asset processing
-    library
-
-  * **WebProfilerBundle** (in dev/test env) - Adds profiling functionality and
-    the web debug toolbar
-
-  * **SensioDistributionBundle** (in dev/test env) - Adds functionality for
-    configuring and working with Symfony distributions
-
-  * [**SensioGeneratorBundle**][13] (in dev/test env) - Adds code generation
-    capabilities
-
-All libraries and bundles included in the Symfony Standard Edition are
-released under the MIT or BSD license.
-
-Enjoy!
-
-[1]:  http://symfony.com/doc/2.6/book/installation.html
-[6]:  http://symfony.com/doc/2.6/bundles/SensioFrameworkExtraBundle/index.html
-[7]:  http://symfony.com/doc/2.6/book/doctrine.html
-[8]:  http://symfony.com/doc/2.6/book/templating.html
-[9]:  http://symfony.com/doc/2.6/book/security.html
-[10]: http://symfony.com/doc/2.6/cookbook/email.html
-[11]: http://symfony.com/doc/2.6/cookbook/logging/monolog.html
-[12]: http://symfony.com/doc/2.6/cookbook/assetic/asset_management.html
-[13]: http://symfony.com/doc/2.6/bundles/SensioGeneratorBundle/index.html
+[1]:  http://www.php.net/
+[2]:  http://symfony.com/
+[3]:  http://www.doctrine-project.org/
+[4]:  https://dev.twitter.com/streaming/overview
+[5]:  http://www.sublimetext.com/
+[6]:  http://www.twitter.com/
+[7]:  https://github.com/fennb/phirehose
+[8]:  http://www.mysql.com/
+[9]:  https://dev.twitter.com/rest/public
+[10]: http://aws.amazon.com/
