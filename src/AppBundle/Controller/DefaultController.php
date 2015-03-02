@@ -26,12 +26,13 @@ class DefaultController extends Controller
     {
     	$request = $this->getRequest();
     	$since = $request->get('since');
+        $maxrows = $since ? null : 50;
 
     	// first we'll fetch the tweeters since they're easy
     	$tweeters = $this->fetchTopTweeters();
 
     	// and then the tweets
-    	$tweetEntities = $this->fetchLatestTweets($since);
+    	$tweetEntities = $this->fetchLatestTweets($since, $maxrows);
 
     	// we really only need the actual tweets and not anything else
     	// in the entity (and, of course, we'll need to decode them)
@@ -48,14 +49,18 @@ class DefaultController extends Controller
     	$repository = $this->getDoctrine()->getRepository('AppBundle:Tweet');
     	$qb = $repository->createQueryBuilder('t');
 
+        $this->get("logger")->info("fetching latest tweets (since = " . $since . ", maxrows = " . $maxrows . ")");
 
     	if ($since) {
 	    	$qb->where('t.tweetId > :since')
 	    		->setParameter('since', $since);
     	}
 
-    	$qb->orderBy('t.id', 'DESC')
-    		->setMaxResults($maxrows);
+        $qb->orderBy('t.id', 'DESC');
+
+        if ($maxrows) {
+            $qb->setMaxResults($maxrows);
+        }
 
     	return $qb->getQuery()->getArrayResult();
     }

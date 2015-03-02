@@ -5,16 +5,22 @@
 
 	var latestTweetId = undefined;
 
-	var createStreamItem = function(type, name, text, avatarUrl) {
+	var createStreamItem = function(type, name, screenName, text, avatarUrl) {
 		var wrapper = $('<div class="' + type + '" />');
 		var content = $('<div class="content" />');
 		var header = $('<div class="stream-item-header" />');
+		var nameSpan = $('<span class="screen-name" />');
+
+		nameSpan.append($('<s />').text('@'));
+		nameSpan.append($('<b />').text(screenName));
 
 		if (avatarUrl) {
 			header.append($('<img class="avatar" />').attr('src', avatarUrl));
 		}
 
 		header.append($('<strong class="name" />').text(name));
+		header.append($('<span />').html('&rlm;'));
+		header.append(nameSpan);
 
 		content.append(header);
 		content.append($('<p />').text(text));
@@ -30,6 +36,7 @@
 		$.each(newTweeters, function(i, tweeter) {
 			var item = createStreamItem('tweeter',
 					tweeter.name,
+					tweeter.screenName,
 					'Total tweets: ' + tweeter.tweetCount,
 					tweeter.profileImageUrl);
 
@@ -53,6 +60,7 @@
 		$.each(newTweets, function(i, tweet) {
 			var item = createStreamItem('tweet',
 				tweet.user.name,
+				tweet.user.screen_name,
 				tweet.text,
 				tweet.user.profile_image_url);
 
@@ -71,22 +79,6 @@
 		count = items.length - 3;
 
 		items.eq(1).text(count + ' result' + (count == 1 ? '' : 's'));
-	};
-
-	var addTweet = function(tweet) {
-		var item = createStreamItem('tweet',
-				tweet.screenNname,
-				tweet.tweet,
-				tweet.profileImageUrl);
-
-		var items = tweets.children();
-		var count = items.length - 2;
-
-		// update the tweet count
-		items.eq(1).text(count + ' result' + (count == 1 ? '' : 's'));
-
-		// and add the new tweet at the top
-		items.eq(1).after(item);
 	};
 
 	var iteration = 0;
@@ -115,14 +107,14 @@
 
 		// when finished, trigger next fetch
 
-		setTimeout(fetchLatest, 2000);
+		setTimeout(fetchLatest, 3000);
 	};
 
 	$(document).ready(function() {
 		tweeters = $('#tweeters');
 		tweets = $('#tweets');
 
-		setTimeout(fetchLatest, 2000);
+		fetchLatest();
 	});
 
 }(jQuery, undefined));

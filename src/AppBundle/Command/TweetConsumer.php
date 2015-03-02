@@ -10,6 +10,7 @@ use \OauthPhirehose;
 class TweetConsumer extends \OauthPhirehose
 {
 	private $em;
+	private $processed = 0;
 
 	public function setEntityManager($em)
 	{
@@ -35,7 +36,12 @@ class TweetConsumer extends \OauthPhirehose
 		{
 			$user = $data['user'];
 
-			print "processing tweet (id = " . $data['id'] . ", user = " . $user['screen_name'] . ")\n";
+			$this->processed++;
+
+			print "processing tweet " . $this->processed
+					. " (id = " . $data['id']
+					. ", user = " . $user['screen_name']
+					. ")\n";
 
 			if ($this->em) {
 				$tweet = new Tweet();
@@ -46,8 +52,6 @@ class TweetConsumer extends \OauthPhirehose
 						->findOneByUserId($user['id_str']);
 
 				if (!$tweeter) {
-					print "this is a new tweeter\n";
-
 					$tweeter = new Tweeter();
 					$tweeter->setUserId($user['id_str']);
 					$tweeter->setName($user['name']);
@@ -55,8 +59,6 @@ class TweetConsumer extends \OauthPhirehose
 					$tweeter->setProfileImageUrl($user['profile_image_url']);
 					$tweeter->setTweetCount(1);
 				} else {
-					print "tweeter already found - incremenenting count\n";
-
 					$tweeter->setTweetCount($tweeter->getTweetCount() + 1);
 				}
 
@@ -64,27 +66,14 @@ class TweetConsumer extends \OauthPhirehose
 				$this->em->persist($tweeter);
 
 				$this->em->flush();
+
+				if ($this->processed % 100 == 0) {
+					$this->em->clear();
+				}
 			} else {
 				print $status . "\n";
 				print $user['screen_name'] . ':' . $data['id'] . ': ' . urldecode($data['text']) . "\n";
 			}
-
-/*
-			if ($this->tweetdb)
-			{
-				$this->tweetdb->insertTweet($data['id'], base64_encode(serialize($data)));
-
-				if (isset($user['screen_name']))
-				{
-					$this->tweetdb->updateTweeter($user['id'], $user['screen_name'], $user['profile_image_url']);
-				}
-			}
-			else
-			{
-				print $status . "\n";
-				print $user['screen_name'] . ':' . $data['id'] . ': ' . urldecode($data['text']) . "\n";
-			}
-*/
 		}
 	}
 }

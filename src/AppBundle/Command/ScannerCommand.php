@@ -28,10 +28,14 @@ class ScannerCommand extends ContainerAwareCommand
 	{
 		$output->writeln('running tweet scanner');
 
+		// apparently, doctrine hogs a lot of memeory if some of the loggers
+		// are enabled, so let's turns those off before we start
+		$em = $this->getContainer()->get('doctrine')->getManager();
+		$em->getConnection()->getConfiguration()->setSQLLogger(null);
+	
 		$consumer = new TweetConsumer(OAUTH_TOKEN, OAUTH_SECRET, Phirehose::METHOD_FILTER);
-		$consumer->setEntityManager($this->getContainer()->get('doctrine')->getManager());
+		$consumer->setEntityManager($em);
 		$consumer->setTrack(array('IBM'));
-//		$consumer->setPersist();
 		$consumer->consume();
 	}
 }
