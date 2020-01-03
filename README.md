@@ -1,9 +1,6 @@
 Tweet Scanner
 =============
 
-This app is currently up and running on an [Amazon Web Services][10] EC2 instance:
-[http://ec2-54-152-218-134.compute-1.amazonaws.com:8080/](http://ec2-54-152-218-134.compute-1.amazonaws.com:8080/)
-
 This is just a simple prototype app to try out [PHP][1], [Symfony2][2],
 [Doctrine][3], and the [Twitter Streaming API][4]. (And the
 [Sublime Text 2][5] editor for the Mac, which is pretty cool but I've
